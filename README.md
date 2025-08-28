@@ -7,9 +7,6 @@ Backend-focused CRUD with filters, pagination, sorting, soft delete/restore, tag
 - Composer
 - MySQL (or MariaDB). Default examples assume MySQL
 
-Optional
-- Docker/Docker Compose (a `docker-compose.yml` is included)
-
 ## Project setup
 1) Install dependencies
 	 - composer install
@@ -20,9 +17,9 @@ Optional
 3) Run migrations
 	 - php yii migrate
 4) Start the dev server
-	 - php yii serve --docroot=@app/web --port=8080
+	 - php yii serve
 
-Then open the frontend: http://localhost:8080/tasks/index.html
+Then open the frontend: http://localhost:8080  (Click "Open Task Manager" button)
 
 Notes
 - API is stateless and requires Bearer auth on every request
@@ -108,7 +105,7 @@ More samples are in `curl-examples.txt` (full URLs, ready to copy).
 Location: `web/tasks/index.html` (Bootstrap + fetch API).
 
 Run
-- Start the dev server (see setup), then open http://localhost:8080/tasks/index.html
+- Start the dev server (see setup), then click "Open Task Manager" or open http://localhost:8080/tasks
 - The UI sends the Authorization header automatically using the demo token
 
 Features
@@ -118,8 +115,6 @@ Features
 
 Quick test
 - Create a task in the UI and verify it appears in the list and via `GET /api/tasks`
-
-Note: `web/frontend/index.html` is a legacy sample; prefer `web/tasks/`.
 
 ## Authentication
 Bearer token required on all API endpoints.

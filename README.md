@@ -2,6 +2,9 @@
 
 Backend-focused CRUD with filters, pagination, sorting, soft delete/restore, tags, status toggle, Bearer auth, and a tiny HTML frontend.
 
+## Demo
+Working example has been deployed at https://task.nursultan.dev
+
 ## Prerequisites
 - PHP 8.0+ with extensions: pdo, pdo_mysql (or pdo_sqlite for tests), mbstring, json, curl
 - Composer

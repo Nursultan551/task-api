@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Task Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container">
+    <a href="/">
+      <span class="navbar-brand">Task Manager</span>
+    </a>
+  </div>
+ </nav>
+<div class="container">
+  <div class="row g-4">
+    <div class="col-12 col-lg-4">
+      <div class="card">
+        <div class="card-header">Create Task</div>
+        <div class="card-body">
+          <form id="createForm">
+            <div class="mb-2">
+              <label class="form-label">Title</label>
+              <input name="title" class="form-control" minlength="5" required />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-select">
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Priority</label>
+              <select name="priority" class="form-select">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Due date</label>
+              <input type="date" name="due_date" class="form-control" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Tags (comma-separated)</label>
+              <input name="tags" class="form-control" placeholder="bug, feature" />
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Create</button>
+            <div id="createError" class="text-danger small mt-2"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <span>Tasks</span>
+          <button class="btn btn-sm btn-outline-secondary ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">Filters</button>
+        </div>
+        <div class="card-body">
+          <div class="collapse mb-3" id="filtersCollapse">
+            <form id="filtersForm" class="row g-2 align-items-end">
+              <div class="col-md-4">
+                <label for="filterSort" class="form-label form-label-sm">Sort by</label>
+                <select id="filterSort" class="form-select form-select-sm">
+                  <option value="">Default (Newest)</option>
+                  <option value="-created_at">Created: Newest first</option>
+                  <option value="created_at">Created: Oldest first</option>
+                  <option value="due_date">Due date: Soonest first</option>
+                  <option value="-due_date">Due date: Latest first</option>
+                  <option value="priority">Priority: Low → High</option>
+                  <option value="-priority">Priority: High → Low</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="filterStatus" class="form-label form-label-sm">Status</label>
+                <select id="filterStatus" class="form-select form-select-sm">
+                  <option value="">All statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="filterPriority" class="form-label form-label-sm">Priority</label>
+                <select id="filterPriority" class="form-select form-select-sm">
+                  <option value="">All priorities</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="filterDueFrom" class="form-label form-label-sm">Due from</label>
+                <input type="date" id="filterDueFrom" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-3">
+                <label for="filterDueTo" class="form-label form-label-sm">Due to</label>
+                <input type="date" id="filterDueTo" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-6">
+                <label for="filterQ" class="form-label form-label-sm">Search</label>
+                <input type="text" id="filterQ" class="form-control form-control-sm" placeholder="Title contains..." />
+              </div>
+              <div class="col-md-3 d-grid">
+                <button class="btn btn-sm btn-primary" id="filterApply" type="button">Apply</button>
+              </div>
+              <div class="col-md-3 d-grid">
+                <button class="btn btn-sm btn-outline-secondary" id="filterClear" type="button">Clear</button>
+              </div>
+              <div class="col-12">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="filterWithDeleted">
+                  <label class="form-check-label" for="filterWithDeleted">With deleted</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="filterOnlyDeleted">
+                  <label class="form-check-label" for="filterOnlyDeleted">Only deleted</label>
+                </div>
+              </div>
+            </form>
+          </div>
+          <table class="table table-sm align-middle" id="tasksTable">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Due</th>
+                <th>Tags</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <nav>
+            <ul class="pagination pagination-sm" id="pager"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="mb-2">
+            <label class="form-label">Title</label>
+            <input name="title" class="form-control" minlength="5" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Due date</label>
+            <input type="date" name="due_date" class="form-control" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Tags (comma-separated)</label>
+            <input name="tags" class="form-control" placeholder="bug, feature" />
+          </div>
+          <div id="editError" class="text-danger small mt-1"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="editSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+ </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API_BASE = `${location.origin}/api`;
+let page = 1;
+let limit = 10;
+let editingId = null;
+
+const STATUS_LABELS = {
+  pending: 'Pending',
+  in_progress: 'In Progress',
+  completed: 'Completed'
+};
+
+const PRIORITY_LABELS = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High'
+};
+
+// Auth
+const TOKEN = 'MY_SUPER_TOKEN';
+function authFetch(url, options = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set('Authorization', `Bearer ${TOKEN}`);
+  return fetch(url, { ...options, headers });
+}
+
+// --- Error helpers ---
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function normalizeErrors(err) {
+  if (!err) return ['Unknown error'];
+  if (typeof err === 'string') return [err];
+  if (Array.isArray(err)) return err.map(String);
+  if (err.message && typeof err.message === 'string' && !err.errors) return [err.message];
+  const out = [];
+  for (const [field, msgs] of Object.entries(err)) {
+    if (Array.isArray(msgs)) {
+      msgs.forEach(m => out.push(`${field}: ${m}`));
+    } else if (typeof msgs === 'string') {
+      out.push(`${field}: ${msgs}`);
+    }
+  }
+  return out.length ? out : ['Validation failed'];
+}
+
+function renderAlertMessages(containerId, err) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const msgs = normalizeErrors(err);
+  el.innerHTML = `<div class="alert alert-danger py-2 px-3 mb-0" role="alert">
+    <ul class="mb-0 ps-3">${msgs.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul>
+  </div>`;
+}
+
+function clearErrors(containerId) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '';
+}
+
+async function parseErrorResponse(res) {
+  try { return await res.json(); } catch (_) { try { return await res.text(); } catch { return 'Request failed'; } }
+}
+
+function rowHtml(t) {
+  const due = t.due_date || '-';
+  const tags = (t.tags || []).join(', ');
+  const statusText = STATUS_LABELS[t.status] || t.status;
+  const priorityText = PRIORITY_LABELS[t.priority] || t.priority;
+  const isDeleted = t.deleted_at !== null && t.deleted_at !== undefined;
+  return `<tr data-id="${t.id}">
+    <td>${t.title}</td>
+    <td><span class="badge ${isDeleted? 'bg-dark' : 'bg-secondary'}">${statusText}${isDeleted?' (Deleted)':''}</span></td>
+    <td>${priorityText}</td>
+    <td>${due}</td>
+    <td>${tags}</td>
+    <td class="text-end">
+      <button class="btn btn-sm btn-outline-secondary me-1" data-action="view" data-bs-toggle="tooltip" title="View">
+        <i class="bi bi-eye"></i>
+      </button>
+      ${isDeleted ? `
+        <button class=\"btn btn-sm btn-outline-warning me-1\" data-action=\"restore\" data-bs-toggle=\"tooltip\" title=\"Restore\"> 
+          <i class=\"bi bi-arrow-clockwise\"></i>
+        </button>` : `
+        <button class=\"btn btn-sm btn-outline-primary me-1\" data-action=\"edit\" data-bs-toggle=\"tooltip\" title=\"Edit\"> 
+          <i class=\"bi bi-pencil-square\"></i>
+        </button>`}
+      ${isDeleted ? '' : `
+        <button class=\"btn btn-sm btn-outline-success me-1\" data-action=\"toggle\" data-bs-toggle=\"tooltip\" title=\"Change status\"> 
+          <i class=\"bi bi-arrow-repeat\"></i>
+        </button>`}
+      ${isDeleted ? '' : `
+        <button class=\"btn btn-sm btn-outline-danger\" data-action=\"delete\" data-bs-toggle=\"tooltip\" title=\"Delete\"> 
+          <i class=\"bi bi-trash\"></i>
+        </button>`}
+    </td>
+  </tr>`;
+}
+
+async function loadTasks() {
+  const status = document.getElementById('filterStatus').value;
+  const priority = document.getElementById('filterPriority').value;
+  const dueFrom = document.getElementById('filterDueFrom')?.value;
+  const dueTo = document.getElementById('filterDueTo')?.value;
+  const q = document.getElementById('filterQ')?.value?.trim();
+  const sort = document.getElementById('filterSort')?.value;
+  const params = new URLSearchParams({ page, limit });
+  if (status) params.set('status', status);
+  if (priority) params.set('priority', priority);
+  if (dueFrom) params.set('due_date_from', dueFrom);
+  if (dueTo) params.set('due_date_to', dueTo);
+  if (q) params.set('q', q);
+  if (sort) params.set('sort', sort);
+  const withDeleted = document.getElementById('filterWithDeleted').checked;
+  const onlyDeleted = document.getElementById('filterOnlyDeleted').checked;
+  if (onlyDeleted) {
+    params.set('deleted', '1');
+  } else if (withDeleted) {
+    params.set('with_deleted', '1');
+  }
+  const res = await authFetch(`${API_BASE}/tasks?${params.toString()}`);
+  const data = await res.json();
+  const tbody = document.querySelector('#tasksTable tbody');
+  disposeTooltips();
+  tbody.innerHTML = '';
+  (data.items || data).forEach(t => tbody.insertAdjacentHTML('beforeend', rowHtml(t)));
+  initTooltips();
+  // Pager
+  const p = document.getElementById('pager');
+  p.innerHTML = '';
+  const total = (data._meta && data._meta.totalCount) || (data.totalCount) || 0;
+  const pageCount = Math.ceil(total / limit) || page;
+  for (let i = 1; i <= pageCount; i++) {
+    p.insertAdjacentHTML('beforeend', `<li class="page-item ${i===page?'active':''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`);
+  }
+}
+
+document.getElementById('pager').addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-page]');
+  if (!a) return;
+  e.preventDefault();
+  page = parseInt(a.dataset.page, 10) || 1;
+  loadTasks();
+});
+
+document.getElementById('filterStatus').addEventListener('change', () => { page = 1; loadTasks(); });
+document.getElementById('filterPriority').addEventListener('change', () => { page = 1; loadTasks(); });
+document.getElementById('filterSort').addEventListener('change', () => { page = 1; loadTasks(); });
+document.getElementById('filterWithDeleted').addEventListener('change', () => {
+  if (document.getElementById('filterOnlyDeleted').checked && document.getElementById('filterWithDeleted').checked) {
+    document.getElementById('filterOnlyDeleted').checked = false;
+  }
+  page = 1; loadTasks();
+});
+document.getElementById('filterOnlyDeleted').addEventListener('change', () => {
+  if (document.getElementById('filterOnlyDeleted').checked) {
+    document.getElementById('filterWithDeleted').checked = false;
+  }
+  page = 1; loadTasks();
+});
+document.getElementById('filterDueFrom').addEventListener('change', () => { page = 1; loadTasks(); });
+document.getElementById('filterDueTo').addEventListener('change', () => { page = 1; loadTasks(); });
+document.getElementById('filterApply').addEventListener('click', () => { page = 1; loadTasks(); });
+document.getElementById('filterQ').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); page = 1; loadTasks(); } });
+document.getElementById('filterClear').addEventListener('click', () => {
+  document.getElementById('filtersForm').reset();
+  page = 1;
+  loadTasks();
+});
+
+// create
+const form = document.getElementById('createForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(form);
+  const payload = Object.fromEntries(fd.entries());
+  if (payload.tags) {
+    payload.tags = payload.tags.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  const res = await authFetch(`${API_BASE}/tasks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+  const err = await parseErrorResponse(res);
+  renderAlertMessages('createError', err);
+  } else {
+    form.reset();
+  clearErrors('createError');
+    loadTasks();
+  }
+});
+
+// table actions
+document.querySelector('#tasksTable tbody').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  disposeTooltips();
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  const action = btn.dataset.action;
+  if (action === 'delete') {
+  await authFetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' });
+    loadTasks();
+  } else if (action === 'toggle') {
+  await authFetch(`${API_BASE}/tasks/${id}/toggle-status`, { method: 'PATCH' });
+    loadTasks();
+  } else if (action === 'edit') {
+    openEdit(id);
+  } else if (action === 'restore') {
+  await authFetch(`${API_BASE}/tasks/${id}/restore`, { method: 'PATCH' });
+    loadTasks();
+  } else if (action === 'view') {
+    openView(id);
+  }
+});
+
+loadTasks();
+
+function fmtDate(val) {
+  if (!val) return '-';
+  return val;
+}
+
+function fmtTs(ts) {
+  if (!ts) return '-';
+  const d = new Date(Number(ts) * 1000);
+  return isNaN(d.getTime()) ? '-' : d.toLocaleString();
+}
+
+async function openView(id) {
+  const res = await authFetch(`${API_BASE}/tasks/${id}`);
+  if (!res.ok) return;
+  const t = await res.json();
+  document.getElementById('viewTitle').textContent = t.title || '';
+  document.getElementById('viewDescription').textContent = t.description || '';
+  document.getElementById('viewStatus').textContent = STATUS_LABELS[t.status] || t.status || '';
+  document.getElementById('viewPriority').textContent = PRIORITY_LABELS[t.priority] || t.priority || '';
+  document.getElementById('viewDueDate').textContent = fmtDate(t.due_date);
+  document.getElementById('viewTags').textContent = (t.tags || []).join(', ');
+  document.getElementById('viewCreatedAt').textContent = fmtTs(t.created_at);
+  document.getElementById('viewUpdatedAt').textContent = fmtTs(t.updated_at);
+  document.getElementById('viewDeletedAt').textContent = t.deleted_at ? fmtTs(t.deleted_at) : '-';
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('viewModal'));
+  modal.show();
+}
+
+// Edit flow (moved into main script block)
+async function openEdit(id) {
+  const res = await authFetch(`${API_BASE}/tasks/${id}`);
+  if (!res.ok) return;
+  const t = await res.json();
+  editingId = id;
+  const form = document.getElementById('editForm');
+  form.title.value = t.title || '';
+  form.description.value = t.description || '';
+  form.status.value = t.status || 'pending';
+  form.priority.value = t.priority || 'medium';
+  form.due_date.value = t.due_date || '';
+  form.tags.value = (t.tags || []).join(', ');
+  document.getElementById('editError').textContent = '';
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editModal'));
+  modal.show();
+}
+
+document.getElementById('editSaveBtn').addEventListener('click', async () => {
+  const form = document.getElementById('editForm');
+  const fd = new FormData(form);
+  const payload = Object.fromEntries(fd.entries());
+  if (payload.tags) {
+    payload.tags = payload.tags.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  const res = await authFetch(`${API_BASE}/tasks/${editingId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+  const err = await parseErrorResponse(res);
+  renderAlertMessages('editError', err);
+  } else {
+    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+    loadTasks();
+  }
+});
+
+// Tooltip helpers
+function disposeTooltips() {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    const inst = bootstrap.Tooltip.getInstance(el);
+    if (inst) inst.dispose();
+  });
+  document.querySelectorAll('.tooltip.show').forEach(t => t.remove());
+}
+
+function initTooltips() {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+  });
+}
+</script>
+
+<!-- View Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Task Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <strong>Title:</strong> <span id="viewTitle"></span>
+          </div>
+          <div class="col-12">
+            <strong>Description:</strong>
+            <div class="border rounded p-2 bg-light" id="viewDescription"></div>
+          </div>
+          <div class="col-md-4"><strong>Status:</strong> <span id="viewStatus"></span></div>
+          <div class="col-md-4"><strong>Priority:</strong> <span id="viewPriority"></span></div>
+          <div class="col-md-4"><strong>Due date:</strong> <span id="viewDueDate"></span></div>
+          <div class="col-12"><strong>Tags:</strong> <span id="viewTags"></span></div>
+          <div class="col-md-4"><small class="text-muted">Created:</small> <span id="viewCreatedAt"></span></div>
+          <div class="col-md-4"><small class="text-muted">Updated:</small> <span id="viewUpdatedAt"></span></div>
+          <div class="col-md-4"><small class="text-muted">Deleted:</small> <span id="viewDeletedAt"></span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

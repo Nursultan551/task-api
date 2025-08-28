@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Task API",
+    "_postman_id": "c7bb9f25-7b62-4f4c-9b8c-8f3a7c2b0a11",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Task API endpoints (full URLs, no variables)."
+  },
+  "item": [
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List tasks (basic)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List tasks (filters + sort)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?status=pending&priority=high&q=docs&due_date_from=2025-08-01&due_date_to=2025-12-31&sort=-due_date&page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "status", "value": "pending"},
+                {"key": "priority", "value": "high"},
+                {"key": "q", "value": "docs"},
+                {"key": "due_date_from", "value": "2025-08-01"},
+                {"key": "due_date_to", "value": "2025-12-31"},
+                {"key": "sort", "value": "-due_date"},
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List by tag (name)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?tag=feature",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "tag", "value": "feature"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List by tag (id)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?tag=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "tag", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List with deleted",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?with_deleted=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "with_deleted", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List only deleted",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks?deleted=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"],
+              "query": [
+                {"key": "deleted", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Write API docs\",\n  \"description\": \"Cover filters and examples\",\n  \"status\": \"pending\",\n  \"priority\": \"high\",\n  \"due_date\": \"2025-09-01\",\n  \"tags\": [\"docs\", \"feature\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get task by ID (1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update task (1)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Write better API docs\",\n  \"description\": \"More examples and notes\",\n  \"status\": \"in_progress\",\n  \"priority\": \"medium\",\n  \"due_date\": \"2025-10-01\",\n  \"tags\": [\"docs\", \"howto\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Toggle status (1)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks/1/toggle-status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks", "1", "toggle-status"]
+            }
+          }
+        },
+        {
+          "name": "Soft delete (1)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "Restore (1)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks/1/restore",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks", "1", "restore"]
+            }
+          }
+        },
+        {
+          "name": "Create (validation error example)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer MY_SUPER_TOKEN"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tasks",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "tasks"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"abc\",\n  \"priority\": \"low\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

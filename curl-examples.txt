@@ -1,0 +1,70 @@
+# 1) Create a task
+curl -sS -X POST http://localhost:8080/api/tasks \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Write API docs",
+    "description": "Cover filters and examples",
+    "status": "pending",
+    "priority": "high",
+    "due_date": "2025-09-01",
+    "tags": ["docs","feature"]
+  }'
+
+# 2) Get a task by ID
+curl -sS http://localhost:8080/api/tasks/1 \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 3) List tasks (basic)
+curl -sS 'http://localhost:8080/api/tasks?page=1&limit=10' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 4) List with filters and sorting
+#   - status, priority, search (q), due date range, sort fields
+curl -sS 'http://localhost:8080/api/tasks?status=pending&priority=high&q=docs&due_date_from=2025-08-01&due_date_to=2025-12-31&sort=-due_date&page=1&limit=10' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 5) List by tag (name)
+curl -sS 'http://localhost:8080/api/tasks?tag=feature' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 6) List by tag (id)
+curl -sS 'http://localhost:8080/api/tasks?tag=1' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 7) Include deleted or only deleted
+curl -sS 'http://localhost:8080/api/tasks?with_deleted=1' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+curl -sS 'http://localhost:8080/api/tasks?deleted=1' \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 8) Update a task (full or partial)
+curl -sS -X PUT http://localhost:8080/api/tasks/1 \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Write better API docs",
+    "description": "More examples and notes",
+    "status": "in_progress",
+    "priority": "medium",
+    "due_date": "2025-10-01",
+    "tags": ["docs","howto"]
+  }'
+
+# 9) Toggle status (pending -> in_progress -> completed -> pending)
+curl -sS -X PATCH http://localhost:8080/api/tasks/1/toggle-status \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 10) Soft delete
+curl -sS -X DELETE http://localhost:8080/api/tasks/1 \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 11) Restore soft-deleted
+curl -sS -X PATCH http://localhost:8080/api/tasks/1/restore \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN'
+
+# 12) Validation error example (title too short)
+curl -sS -X POST http://localhost:8080/api/tasks \
+  -H 'Authorization: Bearer MY_SUPER_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"abc","priority":"low"}'
